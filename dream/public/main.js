@@ -1,5 +1,8 @@
+import { response } from "express";
+
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
+  showSpinner();
 
   const data = new FormData(form);
   try {
@@ -12,15 +15,30 @@ form.addEventListener("submit", async (e) => {
         prompt: data.get("prompt"),
       }),
     });
-    try {
-      const { image } = await response.json();
-    } catch (e) {
-      console.log("response.json error:", e);
-    }
-
-    const result = document.querySelector("#result");
-    result.innerHTML = `<img src="${image}" width="512" />`;
   } catch (e) {
     console.log("there is a problem:", e);
+    response.status(500).send(error?.response.data.error.message);
   }
+
+  if (response.ok) {
+    const { image } = await response.json();
+  } else {
+    alert(err);
+    const err = await response.text();
+  }
+  hideSpinner();
+  const result = document.querySelector("#result");
+  result.innerHTML = `<img src="${image}" width="512" />`;
 });
+
+function showSpinner() {
+  const button = document.querySelector("button");
+  button.disabled = true;
+  button.innerHTML = 'Dreaming... <span class="spinner">🧠</span>';
+}
+
+function hideSpinner() {
+  const button = document.querySelector("button");
+  button.disabled = false;
+  button.innerHTML = "Dream";
+}
