@@ -12,8 +12,11 @@ form.addEventListener("submit", async (e) => {
         prompt: data.get("prompt"),
       }),
     });
-
-    const { image } = await response.json();
+    try {
+      const { image } = await response.json();
+    } catch (e) {
+      console.log("response.json error:", e);
+    }
 
     const result = document.querySelector("#result");
     result.innerHTML = `<img src="${image}" width="512" />`;
