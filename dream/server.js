@@ -10,17 +10,19 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 
 import express from "express";
-import cors from "cors"; //cross origin resource sharing
+import cors from "cors";
 
 const app = express();
-
+app.use(express.static("../public"));
 app.use(cors());
-app.use(express.json()); // handle incoming data in json format
+app.use(express.json());
 
 app.post("/dream", async (req, res) => {
   const prompt = req?.body?.prompt;
   if (!prompt) {
-    return { status: 400, msg: "you have to enter a string to get data" };
+    return res
+      .status(400)
+      .send({ msg: "you have to enter a string to get data" });
   }
   try {
     console.log("here is the user prompt", { prompt });
@@ -33,6 +35,11 @@ app.post("/dream", async (req, res) => {
     res.send({ image });
   } catch (e) {
     console.log("Dream post error", e);
+    res.status(500).send({ error: "Something went wrong!" });
   }
 });
+
 app.listen(8080, () => console.log("make art on http://localhost:8080/dream"));
+app?.get("/dream", (req, res) => {
+  res?.send("Dream GET endpoint");
+});
